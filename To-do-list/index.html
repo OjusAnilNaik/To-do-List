@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>To - Do - List </title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📝 To - Do - List</h1>
+      <div class="controls">
+        <button id="themeToggle" title="Toggle light/dark mode">🌙</button>
+        <button id="clearAll" title="Clear all notes">🗑️ Clear All</button>
+      </div>
+    </header>
+
+    <div class="input-section">
+      <input id="taskInput" placeholder="Write a note..." />
+      <button id="emojiBtn" title="Add emoji">😊</button>
+      <input type="color" id="colorPicker" value="#ffeb3b" title="Pick note color" />
+      <button id="addBtn" title="Add new note">Add</button>
+    </div>
+
+    <div id="emojiPanel" class="emoji-panel hidden"></div>
+
+    <!-- 🔽 Filter Buttons Added Here -->
+    <div class="filter-section">
+      <button id="filterAll" class="filter-btn active">All</button>
+      <button id="filterPinned" class="filter-btn">Pinned</button>
+      <button id="filterNotDone" class="filter-btn">Not Done</button>
+      <button id="filterDone" class="filter-btn">Done</button>
+    </div>
+
+    <ul id="taskList"></ul>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

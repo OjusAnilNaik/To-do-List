@@ -1,0 +1,241 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+  color: #222;
+  margin: 0;
+  padding: 0;
+  transition: 0.3s;
+}
+
+body.dark {
+  background-color: #121212;
+  color: #f1f1f1;
+}
+
+.container {
+  width: 90%;
+  max-width: 600px;
+  margin: 40px auto;
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+body.dark .container {
+  background: #1e1e1e;
+  box-shadow: 0 0 10px rgba(255,255,255,0.1);
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.controls button {
+  border: 1px solid #ccc;
+  background: transparent;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 6px;
+  transition: 0.2s;
+  color: inherit;
+}
+
+.controls button:hover {
+  border: 2.5px solid #ffb347;
+}
+
+body.dark .controls button:hover {
+  border: 2.5px solid #ffb347;
+}
+
+/* Input Section */
+.input-section {
+  display: flex;
+  gap: 8px;
+  margin: 15px 0;
+}
+
+#taskInput {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+#taskInput:hover {
+  border: 3px solid #ffb347;
+}
+
+#taskInput:focus {
+  border: 2px solid #ffb347;
+  box-shadow: 0 0 5px darkblue;
+}
+
+button {
+  border: none;
+  outline: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+  position: relative;
+  color: white;
+  background: #ffb347;
+  padding: 10px;
+}
+
+/* Tooltip */
+button[title]::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: white;
+  padding: 5px 8px;
+  border-radius: 5px;
+  font-size: 12px;
+  opacity: 0;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity 0.2s ease-in-out;
+  z-index: 5;
+}
+button:hover[title]::after {
+  opacity: 1;
+}
+
+/* Filter Buttons */
+.filter-section {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 15px 0;
+}
+
+.filter-btn {
+  background: white;
+  color: darkgreen;
+  border: 2px solid darkgreen;
+  padding: 6px 12px;
+  border-radius: 13px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-weight: bold;
+}
+
+.filter-btn:hover {
+  background: #e8f5e9;
+}
+
+.filter-btn.active {
+  background: darkgreen;
+  color: white;
+}
+
+body.dark .filter-btn {
+  background: black;
+  color: white;
+  border: 2px solid darkgreen;
+}
+
+body.dark .filter-btn.active {
+  background: darkgreen;
+}
+
+body.dark .filter-btn:hover {
+  background: #696969;
+}
+
+/* Notes List */
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  background: #c8f8f9;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 6px;
+  border-left: 6px solid #ffeb3b;
+  position: relative;
+}
+
+body.dark li {
+  background: #2a2a2a;
+}
+
+.note-text {
+  margin-bottom: 6px;
+  word-wrap: break-word;
+}
+
+.actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* Button colors inside notes */
+.actions .pin,
+.actions .edit {
+  background: #b8b3f5;
+}
+
+.actions .pin:hover,
+.actions .edit:hover {
+  background: #9f97f0;
+}
+
+.actions .speak {
+  background: #9c27b0;
+}
+.actions .speak:hover {
+  background: #7b1fa2;
+}
+
+.actions .delete {
+  background: #e53935;
+}
+.actions .delete:hover {
+  background: #c62828;
+}
+
+.pinned {
+  border: 2px solid gold;
+}
+
+/* Emoji Panel */
+.emoji-panel {
+  display: flex;
+  flex-wrap: wrap;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 10px;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.emoji-panel span {
+  font-size: 22px;
+  cursor: pointer;
+}
+.hidden {
+  display: none;
+}
+
+/* ✅ Done checkmark */
+.done-mark {
+  position: absolute;
+  right: 12px;
+  top: 45%;
+  transform: translateY(-50%);
+  font-size: 24px;
+  vertical-align: middle;
+}
