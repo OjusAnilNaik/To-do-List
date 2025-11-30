@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced To-Do tasks</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>My To-Do Tasks</h1>
+            <button id="theme-toggle">
+                <i class="fa-solid fa-circle-dot"></i>
+            </button>
+        </header>
+
+        <div class="progress-container">
+            <p>
+                Progress: 
+                <span class="progress-details">
+                    {{ completed_tasks }} / {{ total_tasks }} completed 
+                    ({{ completion_percentage }}%)
+                </span>
+            </p>
+
+            <div class="progress-bar-shell">
+
+                <div class="progress-bar-fill" style="width: {{ completion_percentage }}%";></div>
+            </div>
+        </div>
+
+        <form action="{{ url_for('index', filter=current_filter, tag=tag_filter) }}" method="POST" class="add-task-form">
+            <input type="text" name="task" placeholder="Enter a new task..." required>
+            <button type="button" id="emoji-toggle" class="emoji-toggle-btn" title="Open Emoji Picker">😀</button>
+            <button type="submit">Add Task</button>
+        </form>
+        
+        <div class="emoji-picker-container" id="emoji-picker-container">
+            <emoji-picker></emoji-picker>
+        </div>
+
+        <div class="filter-controls">
+
+            <div class="status-controls"> 
+
+                <a href="{{ url_for('index', filter='all') }}" class="filter-btn {% if current_filter == 'all' and not tag_filter %}active{% endif %}">All</a>
+                <a href="{{ url_for('index', filter='undone') }}" class="filter-btn {% if current_filter == 'undone' and not tag_filter %}active{% endif %}">To Do</a>
+                <a href="{{ url_for('index', filter='done') }}" class="filter-btn {% if current_filter == 'done' and not tag_filter %}active{% endif %}">Done</a>
+                <a href="{{ url_for('index', filter='pinned') }}" class="filter-btn {% if current_filter == 'pinned' and not tag_filter %}active{% endif %}">Pinned</a>
+                
+                <form action="{{ url_for('clear_completed') }}" method="POST" class="action-form">
+                    <input type="hidden" name="current_filter" value="{{ current_filter }}">
+                    <input type="hidden" name="tag_filter" value="{{ tag_filter }}">
+                    <button type="submit" class="filter-btn delete-btn" onclick="return confirm('Are you sure you want to delete all completed tasks?')" title="Clear Completed">🗑️ Clear Done</button>
+                </form>
+            </div>
+
+            <div class="tag-filters">
+                {% for tag in all_tags %}
+                    <a href="{{ url_for('index', filter=current_filter, tag=tag) }}" class="tag-filter-btn filter-btn {% if tag_filter == tag %}active{% endif %}">#{{ tag }}</a>
+                {% endfor %}
+                {% if tag_filter %}
+                    <a href="{{ url_for('index', filter=current_filter) }}" class="filter-btn clear-filter-btn">Clear Tag Filter</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <ul class="task-list" id="task-list">
+            {% for task in tasks %}
+                <li class="task-item show-details-btn 
+                    {% if task['completed'] %}completed{% endif %}
+                    {% if task['pinned'] %}pinned-highlight no-drag{% endif %}"
+                    style="--task-custom-color: {{ task['color'] }};"
+                    data-task-id="{{ task['id'] }}">
+                    
+                    <span class="task-text">
+                        {% if task['pinned'] %}<span class="pin-icon">📌</span>{% endif %}
+                        {{ task['task'] }}
+                        <small class="timestamp">Last updated: {{ task['updated_at'].split('.')[0] }}</small>
+
+                        <div class="task-tags">
+
+                            {% for tag in task['tags'] %}
+                                <span class="tag-badge">#{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                    </span>
+
+                    <div class="task-actions">
+
+                        <form action="{{ url_for('pin', task_id=task['id']) }}" method="POST" class="action-form">
+                            <input type="hidden" name="current_filter" value="{{ current_filter }}">
+                            <input type="hidden" name="tag_filter" value="{{ tag_filter }}">
+                            <button type="submit" class="icon-btn pin-btn" title="Pin Task">📌</button>
+                        </form>
+
+                        <form action="{{ url_for('toggle', task_id=task['id']) }}" method="POST" class="action-form">
+                            <input type="hidden" name="current_filter" value="{{ current_filter }}">
+                            <input type="hidden" name="tag_filter" value="{{ tag_filter }}">
+                            <button type="submit" class="icon-btn toggle-btn" title="Mark as Done/Undone"><i class="fa-regular fa-circle-check"></i></button>
+                        </form>
+
+                        <button class="icon-btn edit-btn" title="Edit Task" data-task-id="{{ task['id'] }}" data-task-text="{{ task['task'] }}"><i class="fa-solid fa-pen-clip"></i></button>
+                        <button class="icon-btn tts-btn" title="Read Aloud" data-task-text="{{ task['task'] }}"><i class="fa-solid fa-volume-high"></i></button>
+
+                        <form action="{{ url_for('color', task_id=task['id']) }}" method="POST" class="action-form">
+                            <input type="hidden" name="current_filter" value="{{ current_filter }}">
+                            <input type="hidden" name="tag_filter" value="{{ tag_filter }}">
+                            <input type="color" name="color" value="{{ task['color'] }}" onchange="this.form.submit()" class="color-picker" title="Change Color">
+                        </form>
+
+                        <form action="{{ url_for('delete', task_id=task['id']) }}" method="POST" class="action-form">
+                            <input type="hidden" name="current_filter" value="{{ current_filter }}">
+                            <input type="hidden" name="tag_filter" value="{{ tag_filter }}">
+                            <button type="submit" class="icon-btn delete-btn" title="Delete Task"><i class="fa-regular fa-trash-can"></i></button>
+                        </form>
+                    </div>
+                </li>
+            {% else %}
+                <li class="no-tasks">🎉 No tasks found for this filter.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div id="edit-modal" class="modal">
+
+        <div class="modal-content">
+            
+            <span class="close-button">&times;</span>
+            <h2>Edit Task</h2>
+            <form id="edit-form" method="POST">
+                <input type="hidden" name="current_filter" value="{{ current_filter }}">
+                <input type="hidden" name="tag_filter" value="{{ tag_filter }}">
+                <input type="text" id="edit-task-text" name="new_task_text" required>
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="details-modal" class="modal">
+
+        <div class="modal-content">
+
+            <span class="close-button" id="close-details-modal">&times;</span>
+            <h2 id="details-task-text">Task Title</h2>
+            <hr>
+
+            <div class="details-section">
+
+                <h3><i class="fa-solid fa-tags"></i> Tags</h3>
+
+                <div id="details-tags-list" class="tags-management-list">
+                    </div>
+
+                <div class="tag-add-container">
+
+                    <select id="new-tag-input" title="Select a tag to add">
+                        <option value="">-- Add Tag --</option>
+                        {% for tag in all_tags %}
+                            <option value="{{ tag }}">{{ tag | capitalize }}</option>
+                        {% endfor %}
+                    </select>
+                    <button id="add-tag-btn" class="filter-btn">Add</button>
+                </div>
+            </div>
+            
+            <div class="details-section">
+
+                <h3><i class="fa-regular fa-clock"></i> Status & Due Date</h3>
+                <p id="details-warning-message" class="warning-message"></p>
+                <p id="details-time-remaining" class="time-remaining"></p>
+                <form id="duedate-form" method="POST">
+                    <label for="details-due-date">Set Due Date:</label>
+                    <input type="date" id="details-due-date" name="due_date">
+                    <button type="submit" class="filter-btn">Save Date</button>
+                </form>
+            </div>
+
+            <div class="details-section">
+                
+                <h3><i class="fa-solid fa-marker"></i> Timestamps</h3>
+                <p><strong>Created At:</strong> <span id="details-created-at"></span></p>
+                <p><strong>Last Updated:</strong> <span id="details-updated-at"></span></p>
+            </div>
+            
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+</html>
